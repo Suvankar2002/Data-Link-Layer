@@ -15,7 +15,7 @@ count = 0
 FINISHED = []
 numberOfSenders = 1
 lock = threading.Lock()
-p = 0.9
+p = 0.6
 
 def transmitData(index):
 	global senders
@@ -40,10 +40,11 @@ def checkBusy(index):
 	global senders
 	global FINISHED
 	global isBusy
+	global p
 	while not(FINISHED[index]):
 		senders[index].recv(7).decode()
 		lock.acquire()
-		if isBusy == 0 and random.random() >= p:
+		if isBusy == 0 and random.random() <= p:
 			senders[index].send(str(0).encode(FORMAT))
 			isBusy = 1
 			lock.release()
@@ -79,6 +80,7 @@ if numberOfSenders<=0:
 
 FINISHED = [False for i in range(numberOfSenders)]
 channel.listen(2*numberOfSenders)
+p = 1/numberOfSenders
 
 print("\n\nWaiting for receivers...\n")
 for i in range(numberOfSenders):
